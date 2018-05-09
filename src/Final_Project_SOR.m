@@ -8,6 +8,7 @@
 
 clc
 clear;
+close all;
 
 if exist('checkpt_SOR.mat','file')     %If a checkpoint file exists, open it
     load('checkpt_SOR.mat')
@@ -29,8 +30,8 @@ Nx=60;                      %Initial number of points in x
 Ny=Nx;                      %Initial number of points in y
 deltax=Lx/(Nx+1);           %Step size in x
 deltay=Ly/(Ny+1);           %Step size in y
-w=2/(1+sin(pi/Nx));         %Relaxation constant
-w_1=(1-w);                  
+w=2/(1+sin(pi/((Nx+Ny)/2)));    %Optimal Relaxation constant
+w_1=(1-w);                      %Constant needed below
     
 
 %Constants 
@@ -85,29 +86,35 @@ while err1>tol
             U1(i,j)=(w_1)*U1(i,j)+w*((dx2dy2*F1(i,j)-dy2*U1(i-1,j)-dy2*U1(i+1,j)-dx2*U1(i,j-1)-dx2*U1(i,j+1))/(denomin));
         end
         %Neumann Condition
-        U1(i,Ny+2)=(w_1)*U1(i,Ny+2)+w*((dx2dy2*F1(i,Ny+2)-dy2*U1(i-1,Ny+2)-dy2*U1(i+1,Ny+1)-dx2*U1(i,Ny+1)-dx2*U1(i,Ny+1))/(denomin));
+        U1(i,Ny+2)=(w_1)*U1(i,Ny+2)+w*((dx2dy2*F1(i,Ny+2)-dy2*U1(i-1,Ny+2)-dy2*U1(i+1,Ny+2)-dx2*U1(i,Ny+1)-dx2*U1(i,Ny+1))/(denomin));
     end
     err1=max(max(abs(Uprev1-U1)./abs(Uprev1)));
     Uprev1=U1;
     iter1=iter1+1;
-    if mod(iter1,1500)==0                               %Save checkpoint file every 1500 iterations
+    if mod(iter1,100)==0                               %Save checkpoint file every 1500 iterations
         save('checkpt_SOR.mat');                   %Saving the file
     end                                                 %Ending if loop
-
 end
 
 U1T=transpose(U1);      %Transpose the matrix so x and y axes are correct
 
 figure()
-surf(x,y,U1T);
+h1=surf(x,y,U1T);
 xlabel('x')
 ylabel('y')
-set(h,'linestyle','none')
+set(h1,'linestyle','none')
+zlabel('U values');
+title('Surface Plot for SOR (Nx=Ny=60)');
+colorbar;
 
 figure()
 contour(x,y,U1T);
 xlabel('x')
 ylabel('y')
+set(h1,'linestyle','none')
+zlabel('U values');
+title('Contour Plot for SOR (Nx=Ny=60)');
+colorbar;
 
 %% Part 2
 %Boundary Conditions
@@ -125,18 +132,36 @@ Uprev2 = U2;
 while err2>tol
     for i=2:Ny+1
         for j=2:Nx+1
-            U2(i,j)=(w_1)*U2(i,j)+w*((dx2dy2*F2(i,j)-dy2*U2(i-1,j)-dy2*U2(i+1,j)-dx2*U2(i,j-1)-dy2*U2(i,j+1))/(denomin));
+            U2(i,j)=(w_1)*U2(i,j)+w*((dx2dy2*F2(i,j)-dy2*U2(i-1,j)-dy2*U2(i+1,j)-dx2*U2(i,j-1)-dx2*U2(i,j+1))/(denomin));
         end
-        U2(i,Ny+2)=(w_1)*U2(i,Ny+2)+w*((dx2dy2*F2(i,Ny+2)-dy2*U2(i-1,Ny+2)-dy2*U2(i+1,Ny+2)-dx2*U2(i,Ny+1)-dy2*U2(i,Ny+1))/(denomin));
+        U2(i,Ny+2)=(w_1)*U2(i,Ny+2)+w*((dx2dy2*F2(i,Ny+2)-dy2*U2(i-1,Ny+2)-dy2*U2(i+1,Ny+2)-dx2*U2(i,Ny+1)-dx2*U2(i,Ny+1))/(denomin));
     end
     err2=max(max(abs(Uprev2-U2)./abs(Uprev2)));
     Uprev2=U2;
     iter2=iter2+1;
-    if mod(iter1,1500)==0                               %Save checkpoint file every 1500 iterations
+    if mod(iter1,100)==0                               %Save checkpoint file every 1500 iterations
         save('checkpt_SOR.mat');                   %Saving the file
     end                                                 %Ending if loop
 end
 
+U2T=transpose(U2);      %Transpose the matrix so x and y axes are correct
+
 figure()
-surf(x,y,U2);
+h2=surf(x,y,U2T);
+xlabel('x')
+ylabel('y')
+set(h2,'linestyle','none')
+zlabel('U values');
+title('Surface Plot for SOR (F=0, Nx=Ny=60)');
+colorbar;
+
+figure()
+contour(x,y,U2T);
+xlabel('x')
+ylabel('y')
+set(h2,'linestyle','none')
+zlabel('U values');
+title('Contour Plot for SOR (F=0, Nx=Ny=60)');
+colorbar;
+%%
 delete('checkpt_SOR.mat');             %Delete checkpoint file once complete
