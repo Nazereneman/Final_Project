@@ -21,7 +21,7 @@ v=0;                    %Given (du/dy @y=by = 0)
 %Initial Problem Setup 
 Lx=bx;                  %Length of x
 Ly=by;                  %Length of y
-Nx=120;                  %Initial number of points in x
+Nx=60;                  %Initial number of points in x
 Ny=Nx;                %Initial number of points in y
 deltax=Lx/(Nx+1);           %Step size in x
 deltay=Ly/(Ny+1);           %Step size in y
@@ -48,16 +48,10 @@ tol=10^-8;                                      %Pick tolerance required
 U1 = zeros(Nx+2,Ny+2);	% Preallocate solution matix with initial guess of ZERO
 
 %Boundary Conditions
-for j = 1:Ny+2                      %u(x=ax,y)=fb(y) boundary condition
-    U1(1,j)=(by-deltay*(j-1))*(by-deltay*(j-1))*cos(Pi*deltay*(j-1)/by);
-end
-
-for j=1:Ny+2                        %u(x=bx,y)=gb(y) boundary condition
-    U1(Nx+2,j)=(deltay*(j-1))*(by-deltay*(j-1))*(by-deltay*(j-1));
-end
-
-for i=1:Nx+2                        %u(x,y=ay)  boundary conditoin
-    U1(i,1)=fbay+(deltax*(i-1)-ax)/cons1*(gbay-fbay);
+for j = 1:Ny+2                      
+    U1(1,j)=(by-deltay*(j-1))*(by-deltay*(j-1))*cos(Pi*deltay*(j-1)/by);    %u(x=ax,y)=fb(y) boundary condition
+    U1(Nx+2,j)=(deltay*(j-1))*(by-deltay*(j-1))*(by-deltay*(j-1));          %u(x=bx,y)=gb(y) boundary condition
+    U1(j,1)=fbay+(deltax*(j-1)-ax)/cons1*(gbay-fbay);                       %u(x,y=ay)  boundary condition
 end
 
 %Error
@@ -79,12 +73,12 @@ while err1>tol
     for i=2:Nx+1
         for j=2:Ny+1
             %Solving for U
-            U1(i,j)=(dx2dy2*F1(i,j)-dy2*U1(i-1,j)-dy2*U1(i+1,j)-dx2*U1(i,j-1)-dy2*U1(i,j+1))/(denomin);
+            U1(i,j)=(dx2dy2*F1(i,j)-dy2*U1(i-1,j)-dy2*U1(i+1,j)-dx2*U1(i,j-1)-dx2*U1(i,j+1))/(denomin);
         end
         %Neumann Condition
-        U1(i,Ny+2)=(dx2dy2*F1(i,Ny+2)-dy2*U1(i-1,Ny+2)-dy2*U1(i+1,Ny+1)-dx2*U1(i,Ny+1)-dy2*U1(i,Ny+1))/(denomin);
+        U1(i,Ny+2)=(dx2dy2*F1(i,Ny+2)-dy2*U1(i-1,Ny+2)-dy2*U1(i+1,Ny+1)-dx2*U1(i,Ny+1)-dx2*U1(i,Ny+1))/(denomin);
     end
-    err1=max(max(((abs(U1)-abs(Uprev1))./abs(U1))));
+    err1=max(max(abs(U1-Uprev1)./abs(U1)));
     Uprev1=U1;
     iter1=iter1+1;
 end
@@ -112,7 +106,7 @@ while err2>tol
         end
         U2(i,Ny+2)=(dx2dy2*F2(i,Ny+2)-dy2*U2(i-1,Ny+2)-dy2*U2(i+1,Ny+2)-dx2*U2(i,Ny+1)-dy2*U2(i,Ny+1))/(denomin);
     end
-    err2=max(max(((abs(U2)-abs(Uprev2))./abs(U2))*100));
+    err2=max(max(abs(U2-Uprev2)./abs(U2)));
     Uprev2=U2;
     iter2=iter2+1;
 end
