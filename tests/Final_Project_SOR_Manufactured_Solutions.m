@@ -17,7 +17,7 @@ v=0;                    %Given (du/dy @y=by = 0)
 
 %% Initial Problem Setup Nodes and Constants
 %Nodes
-Nx=320;                         %Initial number of points along x-axis
+Nx=60;                         %Initial number of points along x-axis
 Ny=Nx;                          %Initial number of points along y-axis
 Lx=bx-ax;                       %Length of x-axis
 Ly=by-ay;                       %Length of y-axis
@@ -25,8 +25,7 @@ deltax=Lx/(Nx+1);               %Step size in x
 deltay=Ly/(Ny+1);               %Step size in y
 k=2;                            %Chosen constant value for Manufactured Solution
 h=2;                            %Chosen constant value for Manufactured Solution
-%w=2/(1+sin(pi/((Nx+Ny)/2)));    %Relaxation constant
-w=1.9;
+w=2/(1+sin(pi/((Nx+Ny)/2)));    %Relaxation constant
 w_1=(1-w);
 
 %Constants that will be used inside the loop
@@ -77,7 +76,6 @@ iter1=0;                            %Set initial iteration to 0
 tol=10^-8;                          %Define tolerance
 
 while err1>tol
-%for z=1:10000
     for j=2:Ny+1                    %loop for all interior x nodes
         for i=2:Nx+1                %loop for all interior y nodes
             %Solving for U
@@ -124,16 +122,31 @@ L1errrel=L1err/Uref;                        %Relative L1 error
 L2err=sqrt(sum(sum((Error).^2))/(Nx*Ny));   %L2error
 L2errrel=L2err/Uref;                        %Relative L2 error
 
-figure()
-surf(x,y,U);
+Uexactt=transpose(Uexact);                  %Transposing so x and y are correct
 
 figure()
-surf(x,y,Uexact);
+surf(x,y,Ut);
+xlabel('x');
+ylabel('y');
+zlabel('U values');
+title('U');
+colorbar;
+
+figure()
+surf(x,y,Uexactt);
+xlabel('x');
+ylabel('y');
+zlabel('U values');
+title('U exact');
+colorbar;
 
 figure()
 h=surf(x,y,Error.^2);                       %Create surface plot
 ylabel('y');                                %Label x-axis
 xlabel('x');                                %Label y-axis
+zlabel('Error^2 Value');
 set(h,'linestyle','none');                  %Removing gridlines
+title('Error^2');
+colorbar;
 %%
 delete('checkpt_SOR_Manuf.mat');             %Delete checkpoint file once complete
