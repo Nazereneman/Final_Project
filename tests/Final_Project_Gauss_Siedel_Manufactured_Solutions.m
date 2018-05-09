@@ -62,24 +62,25 @@ for i=1:Nx+2
     end
 end
 
-for z=1:1000
+U1a=U1;
+for z=1:100000
     for i=2:Nx+1
         for j=2:Ny+1
             %%%%% Different Equations for U if wanted %%%%%%%%%%%%%%%%%%%%
-            U1(i,j)=(deltax*deltax*F1(i,j)-(U1(i-1,j)+U1(i+1,j)+U1(i,j-1)+U1(i,j+1)))/(-4+deltax*deltax*lamda1);
+            U1a(i,j)=(deltax*deltax*F1(i,j)-(U1(i-1,j)+U1(i+1,j)+U1(i,j-1)+U1(i,j+1)))/(-4+deltax*deltax*lamda1);
             %U1a(i,j)=(Cons4*F1(i,j)-dy2*U1(i+1,j)-dy2*U1(i-1,j)-dx2*U1(i,j+1)-dx2*U1(i,j-1))/(Cons5a);
             %U1(i,j)=((U1(i-1,j)+U1(i+1,j)+U1(i,j-1)+U1(i,j+1))-deltax*deltax*F1(i,j))/(4-deltax*deltax*lamda1);
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %U1(i,j)=(dy2*U1(i-1,j)+dy2*U1(i+1,j)+dx2*U1(i,j-1)+dx2*U1(i,j+1))/(denoma)-(dx2dy2*F1(i,j))/(denoma);
         end
         %%%%%%%%%%%% Different Neumann Conditions if wanted %%%%%%%%%%%%%%
-        U1(i,Ny+2)=(deltax*deltax*F1(i,Ny+2)-(U1(i-1,Ny+2)+U1(i+1,j)+U1(i,Ny+1)+U1(i,Ny+1)))/(-4+deltax*deltax*lamda1);
+        U1(i,Ny+2)=(deltax*deltax*F1(i,Ny+2)-(U1(i-1,Ny+2)+U1(i+1,Ny+2)+U1(i,Ny+1)+U1(i,Ny+1)))/(-4+deltax*deltax*lamda1);
         %U1a(i,Ny+2)=(Cons4*F1(i,Ny+2)-dy2*U1(i+1,Ny+2)-dy2*U1(i-1,Ny+2)-dx2*U1(i,Ny+1)-dx2*U1(i,Ny+1))/(Cons5a);
         %U1(i,Ny+2)=((U1(i-1,Ny+2)+U1(i+1,Ny+2)+U1(i,Ny+1)+U1(i,Ny+1))-deltax*deltax*F1(i,Ny+2))/(4-deltax*deltax*lamda1);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %U1(i,Ny+2)=((dy2)*U1(i-1,Ny+2)+(dy2)*U1(i+1,Ny+2)+(dx2)*U1(i,Ny+1)+(dx2)*U1(i,Ny+1))/(denoma)-(dx2dy2*F1(i,Ny+2))/(denoma);
     end
-    
+    U1=U1a;
 end
 
 figure()
