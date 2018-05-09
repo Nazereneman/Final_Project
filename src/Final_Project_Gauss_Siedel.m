@@ -45,18 +45,12 @@ for j = 1:Ny+2                      %u(x=ax,y)=fb(y) boundary condition
 end
 
 for j=1:Ny+2                        %u(x=bx,y)=gb(y) boundary condition
-    U1(Ny+2,j)=(deltay*(j-1))*(by-deltay*(j-1))*(by-deltay*(j-1));
+    U1(Nx+2,j)=(deltay*(j-1))*(by-deltay*(j-1))*(by-deltay*(j-1));
 end
 
 for i=1:Nx+2                        %u(x,y=ay)  boundary conditoin
     U1(i,1)=fbay+(deltax*(i-1)-ax)/cons1*(gbay-fbay);
 end
-
-% % %Wrong
-% for i=1:Nx+2                        %du/dy @y=by = 0 boundary condition
-%    U2(i,Ny+2)=2*deltay*c*v;
-%    c=c+1;
-% end
 
 %Part 1 Using Gauss Siedel
 F1=zeros(Nx+2,Ny+2);
@@ -67,20 +61,21 @@ for i=1:Nx+2
     end
 end
 
+
 for z=1:100
     for i=2:Nx+1
         for j=2:Ny+1
             %%%%% Different Equations for U if wanted %%%%%%%%%%%%%%%%%%%%
-            U1(i,j)=(deltax*deltax*F1(i,j)-(U1(i-1,j)+U1(i+1,j)+U1(i,j-1)+U1(i,j+1)))/(-4+deltax*deltax*lamda1);
+            %U1(i,j)=(deltax*deltax*F1(i,j)-(U1(i-1,j)+U1(i+1,j)+U1(i,j-1)+U1(i,j+1)))/(-4+deltax*deltax*lamda1);
             %U1a(i,j)=(Cons4*F1(i,j)-dy2*U1(i+1,j)-dy2*U1(i-1,j)-dx2*U1(i,j+1)-dx2*U1(i,j-1))/(Cons5a);
-            %U1(i,j)=((U1(i-1,j)+U1(i+1,j)+U1(i,j-1)+U1(i,j+1))-deltax*deltax*F1(i,j))/(4-deltax*deltax*lamda1);
+            U1(i,j)=((U1(i-1,j)+U1(i+1,j)+U1(i,j-1)+U1(i,j+1))-deltax*deltax*F1(i,j))/(4-deltax*deltax*lamda1);
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %U1(i,j)=(dy2*U1(i-1,j)+dy2*U1(i+1,j)+dx2*U1(i,j-1)+dx2*U1(i,j+1))/(denoma)-(dx2dy2*F1(i,j))/(denoma);
         end
         %%%%%%%%%%%% Different Neumann Conditions if wanted %%%%%%%%%%%%%%
-        U1(i,Ny+2)=(deltax*deltax*F1(i,Ny+2)-(U1(i-1,Ny+2)+U1(i+1,j)+U1(i,Ny+1)+U1(i,Ny+1)))/(-4+deltax*deltax*lamda1);
+        %U1(i,Ny+2)=(deltax*deltax*F1(i,Ny+2)-(U1(i-1,Ny+2)+U1(i+1,Ny+2)+U1(i,Ny+1)+(U1(i,Ny+1)-2*deltax*v)))/(-4+deltax*deltax*lamda1);
         %U1a(i,Ny+2)=(Cons4*F1(i,Ny+2)-dy2*U1(i+1,Ny+2)-dy2*U1(i-1,Ny+2)-dx2*U1(i,Ny+1)-dx2*U1(i,Ny+1))/(Cons5a);
-        %U1(i,Ny+2)=((U1(i-1,Ny+2)+U1(i+1,Ny+2)+U1(i,Ny+1)+U1(i,Ny+1))-deltax*deltax*F1(i,Ny+2))/(4-deltax*deltax*lamda1);
+        U1(i,Ny+2)=((U1(i-1,Ny+2)+U1(i+1,Ny+2)+U1(i,Ny+1)+U1(i,Ny+1))-deltax*deltax*F1(i,Ny+2))/(4-deltax*deltax*lamda1);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %U1(i,Ny+2)=((dy2)*U1(i-1,Ny+2)+(dy2)*U1(i+1,Ny+2)+(dx2)*U1(i,Ny+1)+(dx2)*U1(i,Ny+1))/(denoma)-(dx2dy2*F1(i,Ny+2))/(denoma);
     end
@@ -90,27 +85,35 @@ end
 figure()
 surf(x,y,U1);
 
-% %%
-% % %Part 2
-% %Boundary Conditions
-% ucoef2=0.0;
-% denomb=denominator-dx2dy2*ucoef2;
-% U2 = zeros(Nx+2,Ny+2);
-% 
-% U2(1,:)=U1(1,:);
-% U2(Nx+2,:)=U1(Nx+2,:);
-% U2(:,1)=U1(:,1);
-% 
-% F2=zeros(Nx+2,Ny+2);
-% 
-% for z=1:1000
-%     for i=2:Ny+1
-%         for j=2:Nx+1
-%             U2(i,j)=(dy2*U2(i-1,j)+dy2*U2(i+1,j)+dx2*U2(i,j-1)+dx2*U2(i,j+1)-dx2dy2*F2(i,j))/(denomb);
-%         end
-%         U2(i,Ny+2)=(dy2*U2(i-1,Ny+2)+dy2*U2(i+1,Ny+2)+dx2*U2(i,Ny+1)+dx2*U2(i,Ny+1)-dx2dy2*F2(i,Ny+2))/(denomb);
-%     end
-% end
-% 
-% figure()
-% surf(x,y,U2);
+%%
+% %Part 2
+%Boundary Conditions
+ucoef2=0.0;
+
+denomb=denominator-dx2dy2*ucoef2;
+U2 = zeros(Nx+2,Ny+2);
+err2=1000;
+k=0;
+tol=10^-8;
+
+U2(1,:)=U1(1,:);
+U2(Nx+2,:)=U1(Nx+2,:);
+U2(:,1)=U1(:,1);
+
+F2=zeros(Nx+2,Ny+2);
+Uprev = U2;
+%while err2>tol
+for z=1:100
+    for i=2:Ny+1
+        for j=2:Nx+1
+            U2(i,j)=(dy2*U2(i-1,j)+dy2*U2(i+1,j)+dx2*U2(i,j-1)+dx2*U2(i,j+1)-dx2dy2*F2(i,j))/(denomb);
+        end
+        U2(i,Ny+2)=(dy2*U2(i-1,Ny+2)+dy2*U2(i+1,Ny+2)+dx2*U2(i,Ny+1)+dx2*U2(i,Ny+1)-dx2dy2*F2(i,Ny+2))/(denomb);
+    end
+    err2=max(max(((abs(U2)-abs(Uprev))./abs(U2))*100));
+    Uprev=U2;
+    k=k+1;
+end
+
+figure()
+surf(x,y,U2);
