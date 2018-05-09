@@ -1,5 +1,6 @@
 clc
 clear;
+close all;
 
 if exist('checkpt_SOR_Manuf.mat','file')     %If a checkpoint file exists, open it
     load('checkpt_SOR_Manuf.mat')
@@ -7,11 +8,11 @@ end
 
 %Given variables
 %lamda1=0.5;            %Given for Helmholtz, not needed for Poisson
-ax=-pi;                   %Given lower x bound
-ay=-pi;                   %Given lower x bound
+ax=0;                   %Given lower x bound
+ay=0;                   %Given lower x bound
 Pi=4*atan(1);           %Known value
-bx=pi;                %Given upper x bound
-by=pi;                %Given upper y bound
+bx=2*pi;                %Given upper x bound
+by=2*pi;                %Given upper y bound
 v=0;                    %Given (du/dy @y=by = 0)
 
 %% Initial Problem Setup Nodes and Constants
@@ -24,7 +25,8 @@ deltax=Lx/(Nx+1);               %Step size in x
 deltay=Ly/(Ny+1);               %Step size in y
 k=2;                            %Chosen constant value for Manufactured Solution
 h=2;                            %Chosen constant value for Manufactured Solution
-w=1.9;    %Relaxation constant
+%w=2/(1+sin(pi/((Nx+Ny)/2)));    %Relaxation constant
+w=1.9;
 w_1=(1-w);
 
 %Constants that will be used inside the loop
@@ -70,7 +72,7 @@ end
 %% Gauss-Seidel Loop
 
 %Error Initialization
-err1=1;                          %Initialize error as 1000 (# greater than tol)
+err1=1000;                          %Initialize error as 1000 (# greater than tol)
 iter1=0;                            %Set initial iteration to 0
 tol=10^-8;                          %Define tolerance
 
@@ -93,8 +95,8 @@ while err1>tol
 end                                                     %Ending while loop
 %% Plotting
 
-x=-pi:deltax:pi;    %Discretize the x axis
-y=-pi:deltay:pi;    %Discretize the y axis
+x=0:deltax:2*pi;    %Discretize the x axis
+y=0:deltay:2*pi;    %Discretize the y axis
 Ut=transpose(U);    %Transpose U so that x and y axes are on correct sides
 
 %Exact U
@@ -121,17 +123,12 @@ L1err=Totalerr/(Nx*Ny);                     %L1error
 L1errrel=L1err/Uref;                        %Relative L1 error
 L2err=sqrt(sum(sum((Error).^2))/(Nx*Ny));   %L2error
 L2errrel=L2err/Uref;                        %Relative L2 error
-logL2=log10(L2err);
-logdeltax=log10(deltax);
 
 figure()
 surf(x,y,U);
 
 figure()
 surf(x,y,Uexact);
-
-figure()
-plot(logL2,logdeltax);
 
 figure()
 h=surf(x,y,Error.^2);                       %Create surface plot
