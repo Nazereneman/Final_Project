@@ -96,6 +96,7 @@ while err1>tol
     end                                                 %Ending if loop
 end
 
+U1average=sum(sum(U1))/((Nx+2)*(Ny+2));
 U1T=transpose(U1);      %Transpose the matrix so x and y axes are correct
 
 figure()
@@ -144,6 +145,7 @@ while err2>tol
     end                                                 %Ending if loop
 end
 
+U2average=sum(sum(U2))/((Nx+2)*(Ny+2));
 U2T=transpose(U2);      %Transpose the matrix so x and y axes are correct
 
 figure()
